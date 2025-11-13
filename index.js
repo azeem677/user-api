@@ -1,28 +1,36 @@
 import express from "express";
+import cartRoutes from "./routes/cartRoutes.js";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes.js";
-
-dotenv.config();
+import fs from "fs";
+import productRoutes from "./routes/productRoutes.js";
 
 const app = express();
+const PORT = 5000;
+
+// ✅ Ensure uploads folder exists
+const uploadDir = "./uploads";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log("📁 Created 'uploads' folder");
+}
+
+// Middleware
+
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
-const PORT = process.env.PORT || 5000;
-
-// ✅ MongoDB connection
+// Routes
+app.use("/api/products", productRoutes);
+app.use("/api/carts", cartRoutes);
+// MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+  .connect("mongodb://127.0.0.1:27017/ecommerceDB")
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Routes
-app.use("/api/users", userRoutes);
-
-// ✅ Start server
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// Start server
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on  http://localhost:${PORT}`)
+);
