@@ -16,7 +16,6 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Middleware
-
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -24,6 +23,7 @@ app.use("/uploads", express.static("uploads"));
 // Routes
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);
+
 // MongoDB connection
 mongoose
   .connect("mongodb://127.0.0.1:27017/ecommerceDB")
@@ -32,5 +32,5 @@ mongoose
 
 // Start server
 app.listen(PORT, () =>
-  console.log(`🚀 Server running on  http://localhost:${PORT}`)
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
