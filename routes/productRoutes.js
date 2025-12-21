@@ -4,12 +4,8 @@ import Product from "../models/productModel.js"; // Your Mongoose model
 
 const router = express.Router();
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
-});
-
+// Use memory storage for serverless-friendly uploads
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // ✅ Add new product
@@ -20,10 +16,13 @@ router.post("/", upload.single("picture"), async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Store image as a data URL (base64) to avoid writing to local disk on serverless platforms
+    const pictureDataUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
     const newProduct = new Product({
       name,
       price,
-      picture: req.file.path.replace(/\\/g, "/"), // replace backslashes for Windows
+      picture: pictureDataUrl,
     });
 
     await newProduct.save();
