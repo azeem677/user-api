@@ -16,4 +16,8 @@ app.use(["/api/products", "/products"], productRoutes);
 app.use(["/api/carts", "/carts"], cartRoutes);
 app.use(["/api/users", "/users"], userRoutes);
 
+app.get(["/", "/api"], (req, res) => {
+    res.json({ message: "API is running correctly!", status: "Ready" });
+});
+
 export default app;
