@@ -2,15 +2,18 @@ import app from "../app.js";
 import connectToDatabase from "../db.js";
 
 export default async function handler(req, res) {
-	// 1. Ensure DB connection is established
 	try {
+		// 1. Ensure DB connection is established before processing
 		await connectToDatabase();
-		console.log("✅ MongoDB connected successfully in serverless function");
 	} catch (err) {
-		console.error("❌ MongoDB connection error in serverless function:", err);
+		console.error("❌ MongoDB connection error:", err);
+		return res.status(500).json({
+			message: "Database connection failed",
+			error: err.message,
+			tip: "Please ensure MONGODB_URI is correctly set in Vercel settings and that your MongoDB Atlas cluster allows connections from all IP addresses (0.0.0.0/0)."
+		});
 	}
 
-	// 2. Pass the request and response objects directly to the Express app
-	// Vercel handles Express apps exported as functions automatically.
+	// 2. Pass the request and response objects to the Express app
 	return app(req, res);
 }
