@@ -1,15 +1,16 @@
-import serverless from "serverless-http";
 import app from "../app.js";
 import connectToDatabase from "../db.js";
 
-const handler = serverless(app);
-
-export default async function (req, res) {
+export default async function handler(req, res) {
+	// 1. Ensure DB connection is established
 	try {
 		await connectToDatabase();
+		console.log("✅ MongoDB connected successfully in serverless function");
 	} catch (err) {
-		console.error("❌ Error connecting to MongoDB:", err);
-		// Continue to handler; requests will fail if DB is required
+		console.error("❌ MongoDB connection error in serverless function:", err);
 	}
-	return handler(req, res);
+
+	// 2. Pass the request and response objects directly to the Express app
+	// Vercel handles Express apps exported as functions automatically.
+	return app(req, res);
 }
